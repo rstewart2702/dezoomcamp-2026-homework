@@ -11,7 +11,11 @@ WORKDIR /app
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy dependency files first (better layer caching)
-COPY "pyproject.tom" "uv.lock" ".python-version"
+# COPY pyproject.toml pyproject.toml
+# COPY uv.lock uv.lock 
+# COPY .python-version .python-version 
+COPY ../pyproject.toml ../.python-version ../uv.lock ./
+
 # Install dependencies from lock file (ensures reproducible builds)
 RUN uv sync --locked
 
