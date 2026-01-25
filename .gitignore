@@ -1,0 +1,8 @@
+*.parquet
+Scripts/**
+Lib/**
+Include/**
+uv.lock
+.lock
+.python-venv
+
