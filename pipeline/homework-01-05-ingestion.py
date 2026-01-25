@@ -33,6 +33,8 @@ parse_dates = [
     "tpep_dropoff_datetime"
 ]
 
+print ("PROGRAM HAS STARTED, AT LEAST!!!") 
+
 @click.command()
 @click.option('--pg-user', default='root', help='PostgreSQL user')
 @click.option('--pg-pass', default='root', help='PostgreSQL password')
@@ -43,13 +45,6 @@ parse_dates = [
 def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
     engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
     # 
-    df = pd.read_csv(
-        prefix + 'yellow_tripdata_2021-01.csv.gz',
-        nrows=100,
-        dtype=dtype,
-        parse_dates=parse_dates
-    )
-
     df_iter = pd.read_csv(
         prefix + 'yellow_tripdata_2021-01.csv.gz',
         dtype=dtype,
@@ -57,6 +52,8 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
         iterator=True,
         chunksize=100000
     )
+
+    df_chunk=next(df_iter)
 
     df_chunk.to_sql(name=target_table, con=engine, if_exists='append')
 
@@ -87,3 +84,6 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
         )
         print("Inserted chunk:", len(df_chunk))
 
+
+if __name__ == "__main__" :
+    run()
