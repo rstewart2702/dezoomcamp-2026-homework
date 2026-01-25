@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -45,37 +41,31 @@ df = pd.read_csv(
 )
 
 
-# In[2]:
-
-
-print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
-
-
-# In[3]:
+## print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
 
 
 # display first rows
-df.head()
+## df.head()
 
 
 # In[4]:
 
 
 # check data types
-df.dtypes
+## df.dtypes
 
 
 # In[5]:
 
 
 # check data shape
-df.shape
+## df.shape
 
 
 # In[6]:
 
 
-df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
+## df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
 # head(n=0) maks sure we only create the table, we don't add any data yet.
 
 
@@ -99,8 +89,8 @@ df_iter = pd.read_csv(
 # In[8]:
 
 
-for df_chunk in df_iter:
-    print(len(df_chunk))
+## for df_chunk in df_iter:
+##     print(len(df_chunk))
 
 
 # ### Inserting Data
