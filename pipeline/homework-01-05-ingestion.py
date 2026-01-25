@@ -2,6 +2,8 @@
 
 import pandas as pd
 from sqlalchemy import create_engine
+import click 
+
 engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
 
 # Read a sample of the data
@@ -40,96 +42,49 @@ df = pd.read_csv(
     parse_dates=parse_dates
 )
 
+@click.command()
+@click.option('--pg-user', default='root', help='PostgreSQL user')
+@click.option('--pg-pass', default='root', help='PostgreSQL password')
+@click.option('--pg-host', default='localhost', help='PostgreSQL host')
+@click.option('--pg-port', default=5432, type=int, help='PostgreSQL port')
+@click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
+@click.option('--target-table', default='yellow_taxi_data', help='Target table name')
+def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
+    # 
+    df_iter = pd.read_csv(
+        prefix + 'yellow_tripdata_2021-01.csv.gz',
+        dtype=dtype,
+        parse_dates=parse_dates,
+        iterator=True,
+        chunksize=100000
+    )
 
-## print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
+    df_chunk.to_sql(name='yellow_taxi_data', con=engine, if_exists='append')
 
+    # N.B. you'll need to re-run the cell which defines the df_iter before running this cell!
+    first_chunk = next(df_iter)
 
-# display first rows
-## df.head()
+    first_chunk.head(0).to_sql(
+        name="yellow_taxi_data",
+        con=engine,
+        if_exists="replace"
+    )
 
+    print("Table created")
 
-# In[4]:
-
-
-# check data types
-## df.dtypes
-
-
-# In[5]:
-
-
-# check data shape
-## df.shape
-
-
-# In[6]:
-
-
-## df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
-# head(n=0) maks sure we only create the table, we don't add any data yet.
-
-
-# ## Ingesting the Data In Chunks
-# We don't want to insert all the data at once. Let's do it in batches and use an iterator for that:
-
-# In[14]:
-
-
-df_iter = pd.read_csv(
-    prefix + 'yellow_tripdata_2021-01.csv.gz',
-    dtype=dtype,
-    parse_dates=parse_dates,
-    iterator=True,
-    chunksize=100000
-)
-
-
-# ### Iterate Over Chunks
-
-# In[8]:
-
-
-## for df_chunk in df_iter:
-##     print(len(df_chunk))
-
-
-# ### Inserting Data
-
-# In[9]:
-
-
-df_chunk.to_sql(name='yellow_taxi_data', con=engine, if_exists='append')
-
-
-# ### Complete Ingestion Loop
-
-# In[15]:
-
-
-# N.B. you'll need to re-run the cell which defines the df_iter before running this cell!
-first_chunk = next(df_iter)
-
-first_chunk.head(0).to_sql(
-    name="yellow_taxi_data",
-    con=engine,
-    if_exists="replace"
-)
-
-print("Table created")
-
-first_chunk.to_sql(
-    name="yellow_taxi_data",
-    con=engine,
-    if_exists="append"
-)
-
-print("Inserted first chunk:", len(first_chunk))
-
-for df_chunk in df_iter:
-    df_chunk.to_sql(
+    first_chunk.to_sql(
         name="yellow_taxi_data",
         con=engine,
         if_exists="append"
     )
-    print("Inserted chunk:", len(df_chunk))
+
+    print("Inserted first chunk:", len(first_chunk))
+
+    for df_chunk in df_iter:
+        df_chunk.to_sql(
+            name="yellow_taxi_data",
+            con=engine,
+            if_exists="append"
+        )
+        print("Inserted chunk:", len(df_chunk))
 
