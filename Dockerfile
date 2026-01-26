@@ -20,7 +20,7 @@ COPY pyproject.toml .python-version uv.lock ./
 RUN uv sync --locked
 
 # Copy application code
-COPY ingest_data.py
+COPY ingest_data.py .
 
 # define what to do first when the container runs
 # in this example, we will just run the script
