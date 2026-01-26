@@ -5,8 +5,8 @@ from sqlalchemy import create_engine
 import click 
 
 # Read a sample of the data
-# prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
-prefix = '../../datasets/homework-01/'
+prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
+# prefix = '../datasets/homework-01/'
 # df = pd.read_csv(prefix + 'yellow_tripdata_2021-01.csv.gz', nrows=100)
 
 dtype = {
