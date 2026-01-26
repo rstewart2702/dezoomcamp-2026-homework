@@ -4,4 +4,6 @@ Lib/**
 Include/**
 .lock
 .python-venv
-
+**/.terraform
+**/terraform.tfstate
+**/terraform.tfstate.backup
