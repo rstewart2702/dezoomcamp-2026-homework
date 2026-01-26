@@ -1,0 +1,445 @@
+Question 1
+Run docker with the python:3.13 image. Use an entrypoint bash to interact with the container.
+
+What's the version of pip in the image?
+
+    25.3
+    24.3.1
+    24.2.1
+    23.3.1
+
+what's the version of pip in the image?  25.3 see below
+rstewart@IMLADRIS MINGW64 /f/2026-learning/datatalks-data-engineering/datasets/homework-01
+$ docker run -i -t python:3.13 bash
+root@faa2f32b129e:/# pip --version
+pip 25.3 from /usr/local/lib/python3.13/site-packages/pip (python 3.13)
+root@faa2f32b129e:/#
+
+THE OTHER WAY IS TO JUST RUN THE CONTAINER, AND THEN LOAD THE pip MODULE 
+AND FROM THAT YOU CAN FIND THE VERSION OF pip:
+
+rstewart@IMLADRIS MINGW64 /f/2026-learning/datatalks-data-engineering/datasets/homework-01
+$ docker run -i -t python:3.13
+Python 3.13.11 (main, Jan 13 2026, 05:59:48) [GCC 14.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import pip
+>>> dir(pip)
+['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '__version__', 'annotations', 'main']
+>>> help (pip)
+Help on package pip:
+
+NAME
+    pip
+
+PACKAGE CONTENTS
+    __main__
+    __pip-runner__
+    _internal (package)
+    _vendor (package)
+
+FUNCTIONS
+    main(args: 'list[str] | None' = None) -> 'int'
+        This is an internal API only meant for use by pip's own console scripts.
+
+        For additional details, see https://github.com/pypa/pip/issues/7498.
+
+VERSION
+    25.3
+
+FILE
+    /usr/local/lib/python3.13/site-packages/pip/__init__.py
+
+
+>>> quit()
+
+ANSWER 25.3
+
+*********************************************************************************
+
+
+Question 2
+
+Given the following docker-compose.yaml, what is the hostname and port that pgadmin should use to connect to the postgres database?
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'ny_taxi'
+    ports:
+      - '5433:5432'
+    volumes:
+      - vol-pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pgadmin@pgadmin.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadmin"
+    ports:
+      - "8080:80"
+    volumes:
+      - vol-pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  vol-pgdata:
+    name: vol-pgdata
+  vol-pgadmin_data:
+    name: vol-pgadmin_data
+
+port 5433, hostname postgres
+
+ANSWER:  postgres:5433
+
+The Docker documentation says that the ports option maps from "outside-visible port" to the 
+"container's port".
+
+
+*********************************************************************************
+
+Question 3:
+
+For the trips in November 2025 (lpep_pickup_datetime between '2025-11-01' and '2025-12-01', exclusive of the upper bound), how many trips had a trip_distance of less than or equal to 1 mile?
+
+    7,853
+    8,007
+    8,254
+    8,421
+
+
+The following query is not going to yield the correct answer if there happen
+to be taxi-rides for which the pickp occurred at '2025-12-01 00:00:00':
+
+select
+  count(*) tally
+from
+  green_taxi_data gt
+where
+    gt.lpep_pickup_datetime between '2025-11-01' and '2025-12-01' 
+and gt.trip_distance <= 1.0;
+
+Answer:  8,007
+
+
+This query is guaranteed to be correct:
+select count(*)  from green_taxi_data where trip_distance <= 1.0 and '2025-11-01'::timestamp <= lpep_pickup_datetime and lpep_pickup_datetime < '2025-12-01'::timestamp;
+
+root@localhost:ny_taxi> select count(*)  from green_taxi_data where trip_distance <= 1.0 and '2025-11-01'::timestamp <= lpep_pickup_datetime and lpep_pickup_datetime < '2025-12-01'::timestamp;
++-------+
+| count |
+|-------|
+| 8007  |
++-------+
+SELECT 1
+
+ANSWER: 8,007
+
+*********************************************************************************
+
+Question 4:
+Which was the pick up day with the longest trip distance? Only consider trips with trip_distance less than 100 miles (to exclude data errors).
+
+Use the pick up time for your calculations.
+
+    2025-11-14
+    2025-11-20
+    2025-11-23
+    2025-11-25
+
+select pickup_day, max_dist
+from (
+ select date_trunc('day', gt.lpep_pickup_datetime) pickup_day, max(gt.trip_distance) max_dist
+ from green_taxi_data gt
+ where gt.trip_distance < 100.0
+ group by date_trunc('day', gt.lpep_pickup_datetime)
+) where pickup_day in ('2025-11-14'::date,'2025-11-20'::date,'2025-11-23'::date,'2025-11-25'::date)
+ order by pickup_day
+
+root@localhost:ny_taxi> select pickup_day, max_dist
+ from (
+ select date_trunc('day', gt.lpep_pickup_datetime) pickup_day, max(gt.trip_distance) max_dist
+ from green_taxi_data gt
+ where gt.trip_distance < 100.0
+ group by date_trunc('day', gt.lpep_pickup_datetime)
+ ) where pickup_day in ('2025-11-14'::date,'2025-11-20'::date,'2025-11-23'::date,'2025-11-25'::date)
+ order by pickup_day
++---------------------+----------+
+| pickup_day          | max_dist |
+|---------------------+----------|
+| 2025-11-14 00:00:00 | 88.03    |
+| 2025-11-20 00:00:00 | 73.84    |
+| 2025-11-23 00:00:00 | 45.26    |
+| 2025-11-25 00:00:00 | 34.14    |
++---------------------+----------+
+SELECT 4
+Time: 0.012s
+
+ANSWER:  2025-11-14
+
+
+*********************************************************************************
+
+
+Question 5
+
+Which was the pickup zone with the largest total_amount (sum of all trips) on November 18th, 2025?
+
+    East Harlem North
+    East Harlem South
+    Morningside Heights
+    Forest Hills
+
+Query:
+
+select z."Borough", z."Zone", sum(gt.total_amount) sum_amt 
+from green_taxi_data gt inner join zones z on z."LocationID" = gt."PULocationID" 
+where 
+    '2025-11-25'::timestamp <= gt.lpep_pickup_datetime and gt.lpep_pickup_datetime < '2025-11-26'::timestamp 
+group by z."Borough", z."Zone" order by sum(gt.total_amount)
+;
+
+
+root@localhost:ny_taxi> select z."Borough", z."Zone", sum(gt.total_amount) sum_amt from green_taxi_data gt inner join zones z on z."LocationID" = gt."PULocationID" wher
+ e '2025-11-25'::timestamp <= gt.lpep_pickup_datetime and gt.lpep_pickup_datetime < '2025-11-26'::timestamp group by z."Borough", z."Zone" order by sum(gt.total_amount)
+ ;
++-----------+-----------------------------------+--------------------+
+| Borough   | Zone                              | sum_amt            |
+|-----------+-----------------------------------+--------------------|
+| Queens    | East Elmhurst                     | 15.0               |
+| Bronx     | West Concourse                    | 16.0               |
+| Bronx     | Hunts Point                       | 16.0               |
+| Brooklyn  | Midwood                           | 16.0               |
+| Manhattan | East Chelsea                      | 16.0               |
+| Manhattan | Midtown East                      | 16.0               |
+| Brooklyn  | Sunset Park West                  | 16.0               |
+| Brooklyn  | Bay Ridge                         | 16.0               |
+| Brooklyn  | Bushwick North                    | 17.12              |
+| Queens    | Maspeth                           | 18.0               |
+| Queens    | Corona                            | 20.0               |
+| Queens    | Auburndale                        | 20.1               |
+| Manhattan | Alphabet City                     | 20.82              |
+| Brooklyn  | Marine Park/Floyd Bennett Field   | 21.56              |
+| Brooklyn  | Erasmus                           | 22.57              |
+| Bronx     | Highbridge                        | 22.84              |
+| Manhattan | Lincoln Square East               | 23.06              |
+| Brooklyn  | Prospect Heights                  | 23.52              |
+| Brooklyn  | Brighton Beach                    | 24.1               |
+| Manhattan | Lincoln Square West               | 24.3               |
+| Bronx     | Eastchester                       | 24.67              |
+| Bronx     | Co-Op City                        | 25.0               |
+| Queens    | Springfield Gardens North         | 26.0               |
+| Bronx     | Woodlawn/Wakefield                | 29.79              |
+| Queens    | Bayside                           | 29.9               |
+| Brooklyn  | East Williamsburg                 | 31.08              |
+| Bronx     | Soundview/Bruckner                | 31.34              |
+| Brooklyn  | East New York                     | 31.58              |
+| Queens    | Bellerose                         | 31.67              |
+| Brooklyn  | Bensonhurst West                  | 32.0               |
+| Brooklyn  | Clinton Hill                      | 32.800000000000004 |
+| Bronx     | East Concourse/Concourse Village  | 33.79              |
+| Brooklyn  | Bath Beach                        | 33.97              |
+| Queens    | Briarwood/Jamaica Hills           | 34.2               |
+| Brooklyn  | East New York/Pennsylvania Avenue | 34.38              |
+| Manhattan | Union Sq                          | 34.75              |
+| Brooklyn  | Gowanus                           | 35.6               |
+| Manhattan | Inwood                            | 35.75              |
+| Brooklyn  | Carroll Gardens                   | 36.0               |
+| Manhattan | Financial District South          | 36.52              |
+| Manhattan | Upper East Side South             | 36.78              |
+| Brooklyn  | Madison                           | 36.85              |
+| Manhattan | Marble Hill                       | 40.18              |
+| Queens    | Jamaica Estates                   | 42.3               |
+| Queens    | LaGuardia Airport                 | 42.3               |
+| Queens    | Flushing Meadows-Corona Park      | 42.5               |
+| Queens    | Kew Gardens Hills                 | 44.89              |
+| Manhattan | Greenwich Village South           | 45.07              |
+| Brooklyn  | Park Slope                        | 45.36              |
+| Queens    | Oakland Gardens                   | 45.72              |
+| Bronx     | Soundview/Castle Hill             | 47.56              |
+| Bronx     | Williamsbridge/Olinville          | 48.53              |
+| Manhattan | Penn Station/Madison Sq West      | 48.62              |
+| Manhattan | Inwood Hill Park                  | 48.89              |
+| Queens    | Richmond Hill                     | 49.02              |
+| Bronx     | Mount Hope                        | 49.2               |
+| Manhattan | Yorkville West                    | 50.9               |
+| Queens    | Murray Hill-Queens                | 51.0               |
+| Manhattan | Little Italy/NoLiTa               | 51.5               |
+| Brooklyn  | Homecrest                         | 53.06              |
+| Manhattan | Garment District                  | 53.84              |
+| Manhattan | Chinatown                         | 53.92              |
+| Bronx     | Spuyten Duyvil/Kingsbridge        | 55.72              |
+| Manhattan | Clinton West                      | 56.38              |
+| Brooklyn  | Crown Heights South               | 58.230000000000004 |
+| Manhattan | Seaport                           | 58.53              |
+| Bronx     | Van Cortlandt Village             | 60.45              |
+| Manhattan | Midtown South                     | 63.22              |
+| Queens    | Long Island City/Queens Plaza     | 63.8               |
+| Brooklyn  | Flatlands                         | 64.92              |
+| Bronx     | University Heights/Morris Heights | 66.87              |
+| Manhattan | Gramercy                          | 67.35              |
+| Manhattan | Clinton East                      | 67.55              |
+| Brooklyn  | East Flatbush/Farragut            | 71.46              |
+| Manhattan | Lenox Hill East                   | 72.35              |
+| Brooklyn  | Cobble Hill                       | 73.23              |
+| Bronx     | Mott Haven/Port Morris            | 73.7               |
+| Manhattan | Murray Hill                       | 74.18              |
+| Brooklyn  | Starrett City                     | 77.01              |
+| Brooklyn  | Prospect Park                     | 77.23              |
+| Queens    | Rego Park                         | 82.80000000000001  |
+| Queens    | Ridgewood                         | 90.82              |
+| Brooklyn  | Prospect-Lefferts Gardens         | 91.53              |
+| Queens    | North Corona                      | 92.7               |
+| Queens    | Cambria Heights                   | 93.09              |
+| Brooklyn  | Crown Heights North               | 93.8               |
+| Manhattan | Lower East Side                   | 93.85999999999999  |
+| Brooklyn  | Brownsville                       | 95.38000000000001  |
+| Queens    | Saint Albans                      | 95.83              |
+| Queens    | Rosedale                          | 99.12              |
+| Queens    | South Jamaica                     | 99.28999999999999  |
+| Manhattan | Flatiron                          | 100.97999999999999 |
+| Brooklyn  | Red Hook                          | 101.45             |
+| Brooklyn  | Bedford                           | 101.55000000000001 |
+| Queens    | Sunnyside                         | 108.4              |
+| Manhattan | Manhattanville                    | 109.0              |
+| Bronx     | Norwood                           | 109.39             |
+| Brooklyn  | Williamsburg (North Side)         | 112.1              |
+| Manhattan | Washington Heights North          | 118.16             |
+| Bronx     | Pelham Parkway                    | 118.24             |
+| Queens    | South Ozone Park                  | 118.72999999999999 |
+| Manhattan | World Trade Center                | 128.63             |
+| Queens    | Old Astoria                       | 131.3              |
+| Brooklyn  | Ocean Hill                        | 133.34             |
+| Brooklyn  | East Flatbush/Remsen Village      | 135.66             |
+| Brooklyn  | Stuyvesant Heights                | 142.82999999999998 |
+| Brooklyn  | Sheepshead Bay                    | 155.77             |
+| Brooklyn  | Boerum Hill                       | 161.14             |
+| Queens    | Woodside                          | 169.14000000000001 |
+| Brooklyn  | Bensonhurst East                  | 171.5              |
+| Brooklyn  | Coney Island                      | 174.68             |
+| Brooklyn  | Canarsie                          | 178.03             |
+| Queens    | Queensbridge/Ravenswood           | 183.14             |
+| Brooklyn  | Bushwick South                    | 185.46             |
+| Queens    | Laurelton                         | 229.9              |
+| Unknown   | <null>                            | 238.0              |
+| Queens    | Long Island City/Hunters Point    | 242.3              |
+| Queens    | Flushing                          | 252.01999999999998 |
+| Queens    | Steinway                          | 270.76             |
+| Manhattan | Upper East Side North             | 305.65000000000003 |
+| Brooklyn  | Flatbush/Ditmas Park              | 339.88             |
+| Manhattan | Bloomingdale                      | 432.14             |
+| Manhattan | Central Harlem North              | 441.3299999999999  |
+| Queens    | Elmhurst/Maspeth                  | 452.78999999999996 |
+| Queens    | Jackson Heights                   | 500.46000000000004 |
+| Queens    | Kew Gardens                       | 506.44000000000005 |
+| Manhattan | Hamilton Heights                  | 529.39             |
+| Brooklyn  | DUMBO/Vinegar Hill                | 558.41             |
+| Queens    | Astoria                           | 598.2199999999999  |
+| Brooklyn  | Brooklyn Heights                  | 684.5499999999998  |
+| Brooklyn  | Downtown Brooklyn/MetroTech       | 1076.74            |
+| Manhattan | Central Harlem                    | 1195.61            |
+| Manhattan | Washington Heights South          | 1592.29            |
+| Queens    | Elmhurst                          | 1922.1100000000006 |
+| Brooklyn  | Fort Greene                       | 1976.1999999999998 |
+| Manhattan | Central Park                      | 2025.5899999999997 |
+| Queens    | Jamaica                           | 2087.3199999999997 |
+| Queens    | Forest Hills                      | 2435.789999999999  |
+| Manhattan | Morningside Heights               | 2603.609999999999  |
+| Manhattan | East Harlem South                 | 6457.670000000005  |
+| Manhattan | East Harlem North                 | 8934.430000000004  |
++-----------+-----------------------------------+--------------------+
+SELECT 141
+Time: 0.013s
+
+Here's another way to do it:
+select u.* from (
+select t.*, max(sum_amt) over () max_sum
+from (
+select z."Borough", z."Zone", sum(gt.total_amount) sum_amt 
+from green_taxi_data gt inner join zones z on z."LocationID" = gt."PULocationID" 
+where 
+    '2025-11-25'::timestamp <= gt.lpep_pickup_datetime and gt.lpep_pickup_datetime < '2025-11-26'::timestamp 
+group by z."Borough", z."Zone" 
+-- order by sum(gt.total_amount)
+) t
+) u
+where u.sum_amt = u.max_sum
+;
++-----------+-------------------+-------------------+-------------------+
+| Borough   | Zone              | sum_amt           | max_sum           |
+|-----------+-------------------+-------------------+-------------------|
+| Manhattan | East Harlem North | 8934.430000000004 | 8934.430000000004 |
++-----------+-------------------+-------------------+-------------------+
+
+
+ANSWER: East Harlem North
+
+
+
+*********************************************************************************
+
+
+Question 6
+
+For the passengers picked up in the zone named "East Harlem North" in November 2025, which was the drop off zone that had the largest tip?
+
+Note: it's tip , not trip. We need the name of the zone, not the ID.
+
+    JFK Airport
+    Yorkville West
+    East Harlem North
+    LaGuardia Airport
+
+select
+  t.*
+from (
+  select
+    gt."PULocationID" pu_zone_loc_id
+  , pu_z."Zone" pu_zone_name
+  , gt."DOLocationID" do_zone_loc_id
+  , do_z."Zone" do_zone_name
+  , gt.tip_amount
+  , max(gt.tip_amount) over () max_tip_amount
+  from
+    green_taxi_data gt inner join zones do_z on do_z."LocationID" = gt."DOLocationID" 
+      inner join zones pu_z on pu_z."LocationID" = gt."PULocationID"
+  where
+      pu_z."Zone" = 'East Harlem North'
+  and '2025-11-01'::timestamp <= gt.lpep_pickup_datetime and gt.lpep_pickup_datetime < '2025-12-01'::timestamp 
+) t 
+where t.tip_amount = t.max_tip_amount
+
++----------------+-------------------+----------------+----------------+------------+----------------+
+| pu_zone_loc_id | pu_zone_name      | do_zone_loc_id | do_zone_name   | tip_amount | max_tip_amount |
+|----------------+-------------------+----------------+----------------+------------+----------------|
+| 74             | East Harlem North | 263            | Yorkville West | 81.89      | 81.89          |
++----------------+-------------------+----------------+----------------+------------+----------------+
+
+
+ANSWER:  East Harlem North
+
+
+*********************************************************************************
+
+
+Question 7
+
+Which of the following sequences, respectively, describes the workflow for:
+
+    Downloading the provider plugins and setting up backend,
+    Generating proposed changes and auto-executing the plan
+    Remove all resources managed by terraform`
+
+Answers:
+
+    terraform import, terraform apply -y, terraform destroy
+    teraform init, terraform plan -auto-apply, terraform rm
+    terraform init, terraform run -auto-approve, terraform destroy
+    terraform init, terraform apply -auto-approve, terraform destroy
+    terraform import, terraform apply -y, terraform rm
+
+ANSWER:  terraform init, terraform apply -auto-approve, terraform destroy
+
