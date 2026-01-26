@@ -17,7 +17,7 @@ provider "google" {
 
 
 resource "google_storage_bucket" "data-lake-bucket" {
-  name          = "<Your Unique Bucket Name>"
+  name          = "datatalks-dezoomcamp2026-puddle-bucket"
   location      = "US"
 
   # Optional, but recommended settings:
@@ -42,7 +42,7 @@ resource "google_storage_bucket" "data-lake-bucket" {
 
 
 resource "google_bigquery_dataset" "dataset" {
-  dataset_id = "<The Dataset Name You Want to Use>"
-  project    = "<Your Project ID>"
+  dataset_id = "datatalks_dezoomcamp2026_dataset"
+  project    = "datatalks-dezoomcamp2026"
   location   = "US"
 }
