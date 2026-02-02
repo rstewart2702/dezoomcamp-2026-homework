@@ -1,0 +1,197 @@
+Seems that you can use Kestra to run Python programs:
++ inside a docker image, which might be a bit slower, at first
++ as a "subprocess" on the same host as that which is running Kestra:
+  this could perform better, conceivably, and their documentation
+  talks about how it's possible to use Python virtual environments, etc.
+  So, their example even uses "uv" and thus gives examples about
+  how uv fits into that approach...
+
+
+I had initial trouble running the 02_python workflow, but maybe I was just
+impatient with letting the download of the container image-layers it needed;
+I killed the first run, and then the second attempt to run it went much
+faster.  That seems t obe a common refrain with this stuff?
+
+In 03_getting_started_data_pipeline, the actual UI (for me, anyways)
+was different, when trying to get the display of the output file/uri;
+it was different from what he demonstrated in the video.  Maybe because
+I'm using Firefox-for-Windows browser?
+
+
+================================================================================
+
+Homework answers:
+
+About the "opening problem":
+They provided a graphic of the git repositories for the yellow and green taxi trip
+data sets.  They seemed to be asking for a Kestra flow program and/or solution description
+in which we ingest the data for the year 2021 for both yellow and green.
+
+They went on further:
+As a hint, Kestra makes that process really easy:
+
+1.    You can leverage the backfill functionality in the scheduled flow to backfill the data for the year 2021. Just make sure to select the time period for which data exists i.e. from 2021-01-01 to 2021-07-31. Also, make sure to do the same for both yellow and green taxi data (select the right service in the taxi input).
+2.    Alternatively, run the flow manually for each of the seven months of 2021 for both yellow and green taxi data. Challenge for you: find out how to loop over the combination of Year-Month and taxi-type using ForEach task which triggers the flow for each combination using a Subflow task.
+
+My initial thought is to try and derive a new flow program which will drive an existing,
+parameterized flow with that "ForEach task" that they mentioned.
+
+================================================================================
+
+CODE-SOLUTION:
+This solution shows how to use a ForEach task, with a Subflow, to ingest the first
+seven months of data for each of the green and yellow taxi lines.
+This uses the already-provided 04_postgres_taxi flow.
+
+`id: hw02_drive_taxi_ingestion
+namespace: zoomcamp
+
+concurrency:
+  limit: 1
+
+tasks:
+  - id: hello
+    type: io.kestra.plugin.core.log.Log
+    message: This is a driver flow to ingest multiple Taxi data files for 2021, for both green and yellow taxi services.
+  
+  - id: iterative_ingestion_green
+    type: io.kestra.plugin.core.flow.ForEach
+    values: [ "01", "02", "03", "04", "05", "06", "07" ]
+    concurrencyLimit: 1
+    tasks:
+      - id: call_subflow_green
+        type: io.kestra.plugin.core.flow.Subflow
+        flowId: 04_postgres_taxi
+        namespace: zoomcamp
+        inputs: 
+          month: "{{ taskrun.value }}"
+          year: "2021"
+          taxi: "green"
+
+
+  - id: iterative_ingestion_yellow
+    type: io.kestra.plugin.core.flow.ForEach
+    values: [ "01", "02", "03", "04", "05", "06", "07" ]
+    concurrencyLimit: 1
+    tasks:
+      - id: call_subflow_yellow
+        type: io.kestra.plugin.core.flow.Subflow
+        flowId: 04_postgres_taxi
+        namespace: zoomcamp
+        inputs: 
+          month: "{{ taskrun.value }}"
+          year: "2021"
+          taxi: "yellow"
+`
+
+Question 1.
+===========
+    Within the execution for Yellow Taxi data for the year 2020 and month 12: what is the uncompressed file size (i.e. the output file yellow_tripdata_2020-12.csv of the extract task)?
+
+    128.3 MiB
+    134.5 MiB
+    364.7 MiB
+    692.6 MiB
+
+Had to add a command to the extract step under the tasks;
+it was
+  - ls -lFrat {{ render(vars.file) }}
+and the output returned was:
+  -rw-r--r-- 1 root root 134481400 Feb  2 06:53 yellow_tripdata_2020-12.csv
+
+Answer:
+    134.5 MiB
+
+
+
+Question 2.
+===========
+    What is the rendered value of the variable file when the inputs taxi is set to green, year is set to 2020, and month is set to 04 during execution?
+
+    {{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.csv
+    green_tripdata_2020-04.csv
+    green_tripdata_04_2020.csv
+    green_tripdata_2020.csv
+
+Answer:
+    green_tripdata_2020-04.csv
+
+
+N.B. At this point, I ran "backfill" for all of 2020-01-01 00:00:00 to 2020-12-01 00:00:00
+to get first 11 months of 2020 loaded up for yellow.
+Next, ran backfill of all of 2020 for green.
+
+Question 3.
+===========
+
+    How many rows are there for the Yellow Taxi data for all CSV files in the year 2020?
+
+    13,537.299
+    24,648,499
+    18,324,219
+    29,430,127
+
+Used:
+root@localhost:ny_taxi> select count(*) tally from yellow_tripdata where filename like 'yellow_tripdata_2020%' ;
++----------+
+| tally    |
+|----------|
+| 24648499 |
++----------+
+SELECT 1
+Time: 0.853s  
+
+Answer:
+    24,648,499
+
+
+Question 4.
+===========
+
+    How many rows are there for the Green Taxi data for all CSV files in the year 2020?
+
+    5,327,301
+    936,199
+    1,734,051
+    1,342,034
+
+Used:
+root@localhost:ny_taxi> select count(*) tally from green_tripdata where filename like 'green_tripdata_2020%';
++---------+
+| tally   |
+|---------|
+| 1734051 |
++---------+
+SELECT 1
+Time: 0.097s
+
+Answer:
+    1,734,051
+
+
+Question 5.
+===========
+
+    How many rows are there for the Yellow Taxi data for the March 2021 CSV file?
+
+    1,428,092
+    706,911
+    1,925,152
+    2,561,031
+
+Answer:
+    1,925,152
+
+
+Question 6.
+===========
+
+    How would you configure the timezone to New York in a Schedule trigger?
+
+    Add a timezone property set to EST in the Schedule trigger configuration
+    Add a timezone property set to America/New_York in the Schedule trigger configuration
+    Add a timezone property set to UTC-5 in the Schedule trigger configuration
+    Add a location property set to New_York in the Schedule trigger configuration
+
+Answer:
+    Add a timezone property set to America/New_York in the Schedule trigger configuration
