@@ -27,7 +27,8 @@ variables:
   staging_table: "public.{{inputs.taxi}}_tripdata_staging"
   table: "public.{{inputs.taxi}}_tripdata"
   data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ inputs.year ~ '-' ~ inputs.month ~ '.csv']}}"
-
+        # This must be the pebble template language's way of concatenating strings, for use as a table-key
+        # for the "table"/"hash-function" called outputs.extract.outputFiles?
 tasks:
   - id: set_label
     type: io.kestra.plugin.core.execution.Labels
