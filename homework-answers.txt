@@ -98,6 +98,15 @@ ANSWER:  postgres:5433
 The Docker documentation says that the ports option maps from "outside-visible port" to the 
 "container's port".
 
+2026-01-30 Fri 23:01 Correction:  the documentation for COMPOSE-files says
+the syntax is: <HOST>:<CONTAINER>
+i.e., the HOST specifies the port seen/used by the application running "inside"
+and CONTAINER specifies the port provided by the enclosing container to
+the "outside" observer.  Thus I got the order wrong.
+Is this consistent with the port-binding syntax used in the ordinary
+"docker container" command, etc?  I think it is, I just managed to 
+misinterpret, get it backwards.
+
 
 *********************************************************************************
 
