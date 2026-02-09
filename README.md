@@ -28,7 +28,7 @@ returned a count of:
 
 20332093
 
-================================================================================
+=========================================================================
 
 Question 2. Data read estimation
 
@@ -46,13 +46,14 @@ ANSWER:
     0 MB for the External Table and 155.12 MB for the Materialized Table
 
 WORK:
+
 Concluded this by highlighting the SQL statement in the web-page editor
 and looking for a "green, circular checkmark icon" and message to appear
 below the query-editor pane; the message for the query of the non-partitioned
 "regular bigquery table" named "fhv_nonpartitioned_tripdata" was:
   `This query will process 155.12 MB when run.`
 
-======================================================================
+=========================================================================
 
 Question 3. Understanding columnar storage
 
@@ -85,7 +86,7 @@ Provided estimate was:
 Provided estimate was:
 `This query will process 310.24 MB when run.`
 
-================================================================================
+=========================================================================
 
 Question 4. Counting zero fare trips
 
@@ -107,8 +108,7 @@ select count(*) from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.
 
 returned the countt of 8333.
 
-
-================================================================================
+=========================================================================
 
 Question 5. Partitioning and clustering
 
@@ -208,7 +208,7 @@ On the other hand, if we are filtering on the entirety of the tpep_dropoff_datet
 then partitioning on tpep_dropoff_datetime is impossible, and the best we could
 do would be to cluster based on tpep_dropoff_datetime, VendorID.
 
-================================================================================
+=========================================================================
 
 Question 6. Partition benefits
 
@@ -242,7 +242,7 @@ where timestamp('2024-03-01') <= t.tpep_dropoff_datetime and t.tpep_dropoff_date
 -- estimated 26.84 MB to be processed/traversed.
 ```
 
-================================================================================
+=========================================================================
 
 Question 7. External table storage
 
@@ -257,7 +257,7 @@ ANSWER:
 
     GCP Bucket
 
-================================================================================
+=========================================================================
 
 Question 8. Clustering best practices
 
@@ -275,7 +275,7 @@ WORK:
 Clustering can impose overhead, extra processing work-and-cost; it depends on the
 kind of querying that will be done, i.e., the "workload" that will be needed.
 
-================================================================================
+=========================================================================
 
 Question 9. Understanding table scans
 
