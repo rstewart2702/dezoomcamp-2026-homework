@@ -51,6 +51,7 @@ Concluded this by highlighting the SQL statement in the web-page editor
 and looking for a "green, circular checkmark icon" and message to appear
 below the query-editor pane; the message for the query of the non-partitioned
 "regular bigquery table" named "fhv_nonpartitioned_tripdata" was:
+
   `This query will process 155.12 MB when run.`
 
 =========================================================================
@@ -78,12 +79,17 @@ the columns are stored separately; this implies that the more columns you access
 database, the more data you can end up scanning, ceteris paribus.
 
 Here are the two queries with the "data read estimates" Google's service provided:
+
 ```select t.PULocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+
 Provided estimate was:
+
 `This query will process 155.12 MB when run.`
 
 ```select t.PULocationID, t.DOLocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+
 Provided estimate was:
+
 `This query will process 310.24 MB when run.`
 
 =========================================================================
@@ -106,7 +112,7 @@ WORK:
 select count(*) from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t where t.fare_amount = 0;
 ```
 
-returned the countt of 8333.
+returned the count of 8333.
 
 =========================================================================
 
@@ -137,6 +143,7 @@ column, or there is a b-tree index for the mini-table on that value,
 or else the entire mini-table structure IS organized in a btree structure!)
 
 So, the better, possible-in-Big-Query answer is:
+
     Partition by tpep_dropoff_datetime and Cluster on VendorID
 
 TABLE-CREATION STATEMENTS:
@@ -292,6 +299,8 @@ works, record tallies of that kind are stored in readily-available locations lik
 or information-schemata, because something like Big Query is a "read-mostly" or "read-only"
 environment, and in such an environment, the total number of rows in a table is something that is
 statically known ahead of all queries.
+
+=========================================================================
 
 ## Homework #2
 This solution shows how to use a ForEach task, with a Subflow, to ingest the first
