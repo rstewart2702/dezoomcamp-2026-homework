@@ -1,9 +1,9 @@
-# Homework 3
-## Loading Data
+## Homework 3
+### Loading Data
 Python to load into my GCP Big Query tables is [here (03-data-warehouse/load_yellow_taxi_data.py)]
 
 
-## Homework and the Queries Used
+### Homework and the Queries Used
 Question 1. Counting records
 
 What is count of records for the 2024 Yellow Taxi Data?
