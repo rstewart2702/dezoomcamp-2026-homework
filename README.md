@@ -80,13 +80,17 @@ database, the more data you can end up scanning, ceteris paribus.
 
 Here are the two queries with the "data read estimates" Google's service provided:
 
-```select t.PULocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+```
+select t.PULocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;
+```
 
 Provided estimate was:
 
 `This query will process 155.12 MB when run.`
 
-```select t.PULocationID, t.DOLocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+```
+select t.PULocationID, t.DOLocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;
+```
 
 Provided estimate was:
 
