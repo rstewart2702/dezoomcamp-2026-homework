@@ -16,6 +16,7 @@ What is count of records for the 2024 Yellow Taxi Data?
     85,431,289
 
 ANSWER:
+
     20,332,093
 
 WORK:
@@ -24,6 +25,7 @@ select count(*) from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.
 ```
 
 returned a count of:
+
 20332093
 
 ================================================================================
@@ -39,7 +41,8 @@ What is the estimated amount of data that will be read when this query is execut
     2.14 GB for the External Table and 0MB for the Materialized Table
     0 MB for the External Table and 0MB for the Materialized Table
 
-ANSWER
+ANSWER:
+
     0 MB for the External Table and 155.12 MB for the Materialized Table
 
 WORK:
@@ -49,7 +52,7 @@ below the query-editor pane; the message for the query of the non-partitioned
 "regular bigquery table" named "fhv_nonpartitioned_tripdata" was:
   `This query will process 155.12 MB when run.`
 
-================================================================================
+======================================================================
 
 Question 3. Understanding columnar storage
 
@@ -63,9 +66,11 @@ Why are the estimated number of Bytes different?
     When selecting multiple columns, BigQuery performs an implicit join operation between them, increasing the estimated bytes processed
 
 ANSWER:
+
     BigQuery is a columnar database, and it only scans the specific columns requested in the query. Querying two columns (PULocationID, DOLocationID) requires reading more data than querying one column (PULocationID), leading to a higher estimated number of bytes processed.
 
 WORK:
+
 I shall verify by looking at the estimates published for both of the requested queries, but
 the answer is that the query which mentions two separate columns scans more data, because
 the columns are stored separately; this implies that the more columns you access in a columnar
@@ -92,6 +97,7 @@ How many records have a fare_amount of 0?
     8,333
 
 ANSWER:
+
     8,333
 
 WORK:
@@ -114,9 +120,11 @@ What is the best strategy to make an optimized table in Big Query if your query 
     Partition by tpep_dropoff_datetime and Partition by VendorID
 
 ANSWER:
+
     Partition by tpep_dropoff_datetime and Cluster on VendorID
 
 WORK:
+
 My first inclination was to answer:
     Cluster on by tpep_dropoff_datetime and Cluster on VendorID
 
@@ -216,6 +224,7 @@ Choose the answer which most closely matches.
     310.31 MB for non-partitioned table and 285.64 MB for the partitioned table
 
 ANSWER:
+
     310.24 MB for non-partitioned table and 26.84 MB for the partitioned table
 
 WORK:
@@ -245,6 +254,7 @@ Where is the data stored in the External Table you created?
     Big Table
 
 ANSWER:
+
     GCP Bucket
 
 ================================================================================
@@ -257,9 +267,11 @@ It is best practice in Big Query to always cluster your data:
     False
 
 ANSWER:
+
     False
 
 WORK:
+
 Clustering can impose overhead, extra processing work-and-cost; it depends on the
 kind of querying that will be done, i.e., the "workload" that will be needed.
 
@@ -270,6 +282,7 @@ Question 9. Understanding table scans
 No Points: Write a SELECT count(*) query FROM the materialized table you created. How many bytes does it estimate will be read? Why?
 
 ANSWER:
+
     Big Query's estimate is "0 B when run."
 
 My initial guess was that was likely because some of this information is already cached.
@@ -279,7 +292,6 @@ works, record tallies of that kind are stored in readily-available locations lik
 or information-schemata, because something like Big Query is a "read-mostly" or "read-only"
 environment, and in such an environment, the total number of rows in a table is something that is
 statically known ahead of all queries.
-
 
 ## Homework #2
 This solution shows how to use a ForEach task, with a Subflow, to ingest the first
