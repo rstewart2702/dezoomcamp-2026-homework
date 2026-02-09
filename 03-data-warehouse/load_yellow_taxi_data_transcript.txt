@@ -1,0 +1,103 @@
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv run python ./load_yellow_taxi_data.py
+Traceback (most recent call last):
+  File "/home/rstewart/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse/./load_yellow_taxi_data.py", line 5, in <module>
+    from google.cloud import storage
+ModuleNotFoundError: No module named 'google'
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv install google.cloud
+error: unrecognized subcommand 'install'
+
+  tip: a similar subcommand exists: 'uv pip install'
+
+Usage: uv [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv add google.cloud
+Resolved 119 packages in 1.52s
+Prepared 1 package in 73ms
+Installed 1 package in 12ms
+ + google-cloud==0.34.0
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv run python ./load_yellow_taxi_data.py
+Traceback (most recent call last):
+  File "/home/rstewart/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse/./load_yellow_taxi_data.py", line 5, in <module>
+    from google.cloud import storage
+ModuleNotFoundError: No module named 'google'
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv run python -i
+Python 3.13.5 (main, Jun 25 2025, 18:55:22) [GCC 14.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import google.cloud
+Traceback (most recent call last):
+  File "<python-input-0>", line 1, in <module>
+    import google.cloud
+ModuleNotFoundError: No module named 'google'
+>>> exit()
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv add google
+Resolved 120 packages in 185ms
+Prepared 1 package in 44ms
+Installed 1 package in 32ms
+ + google==3.0.0
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv run python -i
+Python 3.13.5 (main, Jun 25 2025, 18:55:22) [GCC 14.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import google
+Traceback (most recent call last):
+  File "<python-input-0>", line 1, in <module>
+    import google
+ModuleNotFoundError: No module named 'google'
+>>> exit()
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv add google-cloud-storage
+Resolved 133 packages in 1.44s
+Prepared 13 packages in 349ms
+Installed 13 packages in 27ms
+ + cryptography==46.0.4
+ + google-api-core==2.29.0
+ + google-auth==2.48.0
+ + google-cloud-core==2.5.0
+ + google-cloud-storage==3.9.0
+ + google-crc32c==1.8.0
+ + google-resumable-media==2.8.0
+ + googleapis-common-protos==1.72.0
+ + proto-plus==1.27.1
+ + protobuf==6.33.5
+ + pyasn1==0.6.2
+ + pyasn1-modules==0.4.2
+ + rsa==4.9.1
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$ uv run python ./load_yellow_taxi_data.py
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet...
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-02.parquet...
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-03.parquet...
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-04.parquet...
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-04.parquet
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-05.parquet...
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-03.parquet
+Downloading https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-06.parquet...
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-06.parquet
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-05.parquet
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-01.parquet
+Downloaded: ./homework-03-downloads/yellow_tripdata_2024-02.parquet
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-04.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-01.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-03.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-02.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-01.parquet
+Verification successful for yellow_tripdata_2024-01.parquet
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-05.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-04.parquet
+Verification successful for yellow_tripdata_2024-04.parquet
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-02.parquet
+Bucket 'datatalks-dezoomcamp2026-puddle-bucket' exists and belongs to your project. Proceeding...
+Uploading ./homework-03-downloads/yellow_tripdata_2024-06.parquet to datatalks-dezoomcamp2026-puddle-bucket (Attempt 1)...
+Verification successful for yellow_tripdata_2024-02.parquet
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-05.parquet
+Verification successful for yellow_tripdata_2024-05.parquet
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-03.parquet
+Verification successful for yellow_tripdata_2024-03.parquet
+Uploaded: gs://datatalks-dezoomcamp2026-puddle-bucket/yellow_tripdata_2024-06.parquet
+Verification successful for yellow_tripdata_2024-06.parquet
+All files processed and verified.
+rstewart@IMLADRIS:~/datatalks-data-engineering/dezoomcamp-2026-homework-clone/03-data-warehouse$
