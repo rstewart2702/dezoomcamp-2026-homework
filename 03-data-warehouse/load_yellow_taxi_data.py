@@ -1,3 +1,10 @@
+# N.B. I had to run a couple of "uv add's" to get this
+# to run correctly:
+#   uv add google
+#   uv add google.cloud
+# I *THINK* this is probably the most important:
+#   uv add google-cloud-storage
+
 import os
 import sys
 import urllib.request
@@ -8,18 +15,19 @@ import time
 
 
 # Change this to your bucket name
-BUCKET_NAME = "dezoomcamp_hw3_2025"
+# BUCKET_NAME = "dezoomcamp_hw3_2025"
+BUCKET_NAME = "datatalks-dezoomcamp2026-puddle-bucket"
 
 # If you authenticated through the GCP SDK you can comment out these two lines
-CREDENTIALS_FILE = "gcs.json"
-client = storage.Client.from_service_account_json(CREDENTIALS_FILE)
+# CREDENTIALS_FILE = "gcs.json"
+# client = storage.Client.from_service_account_json(CREDENTIALS_FILE)
 # If commented initialize client with the following
-# client = storage.Client(project='zoomcamp-mod3-datawarehouse')
+client = storage.Client(project='datatalks-dezoomcamp2026')
 
 
 BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-"
 MONTHS = [f"{i:02d}" for i in range(1, 7)]
-DOWNLOAD_DIR = "."
+DOWNLOAD_DIR = "./homework-03-downloads"
 
 CHUNK_SIZE = 8 * 1024 * 1024
 
