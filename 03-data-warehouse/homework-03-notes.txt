@@ -1,3 +1,9 @@
+# Homework 3
+## Loading Data
+Python to load into my GCP Big Query tables is [here (03-data-warehouse/load_yellow_taxi_data.py)]
+
+
+## Homework and the Queries Used
 Question 1. Counting records
 
 What is count of records for the 2024 Yellow Taxi Data?
@@ -11,7 +17,9 @@ ANSWER:
     20,332,093
 
 WORK:
+```
 select count(*) from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_tripdata`;
+```
 
 returned a count of:
 20332093
@@ -33,15 +41,11 @@ ANSWER
     0 MB for the External Table and 155.12 MB for the Materialized Table
 
 WORK:
-concluded this by highlighting the SQL statement in the web-page editor
+Concluded this by highlighting the SQL statement in the web-page editor
 and looking for a "green, circular checkmark icon" and message to appear
 below the query-editor pane; the message for the query of the non-partitioned
 "regular bigquery table" named "fhv_nonpartitioned_tripdata" was:
-  "This query will process 155.12 MB when run."
-
-(And I guess the good thing about all of this is that people could actually start
-getting pro-rated pay based on how wasteful their programs are, via semi-objective
-measurements provided in cloud-systems?  Heh.)
+  `This query will process 155.12 MB when run.`
 
 ================================================================================
 
@@ -66,11 +70,13 @@ the columns are stored separately; this implies that the more columns you access
 database, the more data you can end up scanning, ceteris paribus.
 
 Here are the two queries with the "data read estimates" Google's service provided:
-select t.PULocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;
-"This query will process 155.12 MB when run."
+```select t.PULocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+Provided estimate was:
+`This query will process 155.12 MB when run.`
 
-select t.PULocationID, t.DOLocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;
-"This query will process 310.24 MB when run."
+```select t.PULocationID, t.DOLocationID from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t;```
+Provided estimate was:
+`This query will process 310.24 MB when run.`
 
 ================================================================================
 
@@ -87,7 +93,9 @@ ANSWER:
     8,333
 
 WORK:
+```
 select count(*) from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t where t.fare_amount = 0;
+```
 
 returned the countt of 8333.
 
@@ -122,27 +130,36 @@ So, the better, possible-in-Big-Query answer is:
     Partition by tpep_dropoff_datetime and Cluster on VendorID
 
 TABLE-CREATION STATEMENTS:
+```
 create table `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_clustered_tripdata`
 cluster by tpep_dropoff_datetime, VendorID
 as select * from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_tripdata` ;
+```
 
+```
 create table `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_partitioned_tripdata`
 partition by date(tpep_dropoff_datetime)
 cluster by tpep_dropoff_datetime, VendorID
 as select * from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_tripdata` ;
+```
 
+```
 select t.*
 from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_partitioned_tripdata` t
 where timestamp("2024-06-01")  <= t.tpep_dropoff_datetime and t.tpep_dropoff_datetime < timestamp("2024-06-02")
 order by t.VendorID;
 -- estimated 17.66 MB traversed 
+```
 
+```
 select t.*
 from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_partitioned_tripdata` t
 where timestamp('2024-06-01') = date_trunc(t.tpep_dropoff_datetime,DAY)
 order by t.VendorID;
 -- estimated 17.66 MB traversed 
+```
 
+```
 select t.*
 from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_clustered_tripdata` t
 where timestamp("2024-06-01")  <= t.tpep_dropoff_datetime and t.tpep_dropoff_datetime < timestamp("2024-06-02")
@@ -151,8 +168,7 @@ order by t.VendorID;
 
 /* this means that partitioning can SIGNIFICANTLY reduce the amount of data traversed,
    when the partitioning is possible. */
-
-
+```
 
 
 I queried for the cardinality of the tpsp_dropoff_datetime column, and discovered
@@ -201,16 +217,19 @@ ANSWER:
     310.24 MB for non-partitioned table and 26.84 MB for the partitioned table
 
 WORK:
+```
 select distinct(t.VendorId) distinct_vendorid
 from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_nonpartitioned_tripdata` t
 where timestamp('2024-03-01') <= t.tpep_dropoff_datetime and t.tpep_dropoff_datetime < timestamp('2024-03-16')
 -- esimtated 310.24 MB to be processed/traversed.
+```
 
+```
 select distinct(t.VendorId) distinct_vendorid
 from `datatalks-dezoomcamp2026.datatalks_dezoomcamp2026_dataset.fhv_partitioned_tripdata` t
 where timestamp('2024-03-01') <= t.tpep_dropoff_datetime and t.tpep_dropoff_datetime < timestamp('2024-03-16')
 -- estimated 26.84 MB to be processed/traversed.
-
+```
 
 ================================================================================
 
