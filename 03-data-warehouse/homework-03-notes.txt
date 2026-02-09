@@ -1,6 +1,6 @@
 ## Homework 3
 ### Loading Data
-Python to load into my GCP Big Query tables is [here (03-data-warehouse/load_yellow_taxi_data.py)]
+Python to load into my GCP Big Query tables is [here](03-data-warehouse/load_yellow_taxi_data.py).
 
 
 ### Homework and the Queries Used
