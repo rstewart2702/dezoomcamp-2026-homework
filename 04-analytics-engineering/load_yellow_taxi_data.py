@@ -21,13 +21,25 @@ BUCKET_NAME = "datatalks-dezoomcamp2026-puddle-bucket"
 # If you authenticated through the GCP SDK you can comment out these two lines
 # CREDENTIALS_FILE = "gcs.json"
 # client = storage.Client.from_service_account_json(CREDENTIALS_FILE)
+
+# 2026-02-14 Sat 20:59
+# IMPORTANT:  set the GOOGLE_APPLICATION_CREDENTIALS environment
+# variable to refer to the filesystem location of the credentials
+# file you want the program libraries to use.
+#
+# This way I don't even store paths-to-credential files in my
+# source code.  This is in the spirit of keeping references to
+# credentials and secrets out of source-code-control repositories.
+#
 # If commented initialize client with the following
 client = storage.Client(project='datatalks-dezoomcamp2026')
 
 
-BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-"
-MONTHS = [f"{i:02d}" for i in range(1, 7)]
-DOWNLOAD_DIR = "./homework-03-downloads"
+# BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2019-"
+BASE_URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata"
+
+MONTHS = [(f"{yr:04d}", f"{i:02d}") for yr in range(2019,2021) for i in range(1, 13)]
+DOWNLOAD_DIR = "./homework-04-downloads"
 
 CHUNK_SIZE = 8 * 1024 * 1024
 
@@ -36,9 +48,9 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 bucket = client.bucket(BUCKET_NAME)
 
 
-def download_file(month):
-    url = f"{BASE_URL}{month}.parquet"
-    file_path = os.path.join(DOWNLOAD_DIR, f"yellow_tripdata_2024-{month}.parquet")
+def download_file(t):
+    url = f"{BASE_URL}_{t[0]}-{t[1]}.csv.gz"
+    file_path = os.path.join(DOWNLOAD_DIR, f"yellow_tripdata_{t[0]}-{t[1]}.csv.gz")
 
     try:
         print(f"Downloading {url}...")
