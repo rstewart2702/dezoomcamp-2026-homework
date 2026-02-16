@@ -98,3 +98,20 @@ sources:
             description: Improvement surcharge
           - name: total_amount
             description: Total amount charged
+
+      - name: fhv_tripdata
+        columns: 
+          - name: dispatching_base_num
+            description: the dispatching base key
+          - name: pickup_datetime
+            description: date and time of pickup
+          - name: dropOff_datetime
+            description: date and time of drop-off
+          - name: PUlocationID
+            description: taxi zone where the meter was engaged
+          - name: DOlocationID
+            descrription: taxi zone where the meter was disengaged
+          - name: SR_Flag
+            description: perhaps this is some kind of rate code?
+          - name: Affiliated_base_number
+            description: the key of the affiliated base
