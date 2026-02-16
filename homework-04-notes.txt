@@ -205,22 +205,88 @@ What is the count of records in stg_fhv_tripdata?
   * 22,998,722
   * 44,112,187
 
+ANSWER:
+  * 43,244,693
+
+
 
 Elaboration:
 I shall have to gin up a python loading program just to set up the GCP
-data for that "fhv" stuff;
-I will need to define an "external table" for the fhv data;
+data for that "fhv" stuff; DONE 2026-02-16 Mon 10:27
 
-Then I shall have to fiddle with the `taxi_rides_ny/models/staging/schema.yml`
-to create a definition for the table (so that there'll be appropriate filterings, etc?)
+I will need to define an "external table" for the fhv data; DONE 2026-02-16 Mon 10:29
 
-AND
+What actually worked out:
+(after asking Gemini for a little help!)
+The SQL comes first, then the yml files which document/elucidate the "schema" and
+"sources" can be automatically generated, given the right "dbt plugin," and
+It looks like those are automatically added when using dbt cloud, it seems.
 
-I shall have to add appropriate entries to the `taxi_rides_ny/models/staging/sources.yml`
-to 
+And:  it seems to be more complicated than that, for dbt stopped to complain
+with:
 
-AND
+```
+Compilation Error
+  Model 'model.taxi_rides_ny.stg_fhv_tripdata' (models/staging/stg_fhv_tripdata.sql) depends on a source named 'raw.fhv_tripdata' which was not found
+```
 
-I shall have to add another `stg_fhv_tripdata.sql` bit to govern the filtering
-required, and this is where the column-renaming according to conventions
-will take place.
+So, I had to add some text to the `taxi_rides_ny/models/staging/sources.yml` file.
+That seems to be required, at least in the case of this project's definition.
+
+So, I created a taxi_rides_ny/models/staging/stg_fhv_tripdata.sql file
+and ran
+
+```
+dbt run --select stg_fhv_tripdata
+```
+
+And after correcting a typo in my SQL, the command above created a
+view which queries the "data lake o'csv files" which are reached
+via the name `dbt_rstewart.fhv_tripdata`.
+
+#### Further Notes
+
+It turns out that some parts can be generated automatically, with commands
+like the following?
+
+```
+dbt run-operation generate_model_yaml --args '{ "model_names":  ["stg_fhv_tripdata"] }'
+```
+
+So I tried it, and it spat out the following to the logged output in the `dbt platform`:
+
+```
+models:
+  - name: stg_fhv_tripdata
+    description: ""
+    columns:
+      - name: dispatching_base_num
+        data_type: string
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+
+      - name: sr_flag
+        data_type: int64
+        description: ""
+
+      - name: affiliated_base_number
+        data_type: string
+        description: ""
+```
+
+So, this is a start on what could be pasted into the `taxi_rides_ny/models/staging/schema.yml`.
