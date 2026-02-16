@@ -290,3 +290,12 @@ models:
 ```
 
 So, this is a start on what could be pasted into the `taxi_rides_ny/models/staging/schema.yml`.
+
+And, the "studio" in `dbt cloud` or `dbt platform` leaves a lot to be desired as far as
+interactions with Git are concerned:  I guess you'd better "restart" studio after making
+changes to files in your project which have *not* been committed yet?  But it's really
+hard to tell, and I hope their documentation talks about it.  But they've clearly tried
+to emulate the VSCode experience, and this has caused me lots of confusion because
+it looked like I had lost work when I really had not, all because the editor in the "studio"
+got out of sync with the "git repository and local working-copy" reality.  This has not
+been a good developer experience.
