@@ -43,8 +43,11 @@ running it; `dbt ls` lets you see what the "graph selection syntax" allows you t
 specify.
 
 References:
+
 https://docs.getdbt.com/reference/node-selection/syntax
+
 https://docs.getdbt.com/reference/commands/run
+
 https://docs.getdbt.com/reference/commands/list
 
 
