@@ -1,7 +1,6 @@
 # Repository for Data Engineering Zoomcamp
 
 ## Homework 4
-
 ### Question 1. dbt Lineage and Execution
 
 Given a dbt project with the following structure:
@@ -146,7 +145,7 @@ Which zone had the highest revenue?
     * Washington Heights South
 
 ANSWER:
-    * East Harlem North
+* East Harlem North
 
 
 Elaboration:

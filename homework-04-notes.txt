@@ -143,7 +143,7 @@ Which zone had the highest revenue?
     * Washington Heights South
 
 ANSWER:
-    * East Harlem North
+* East Harlem North
 
 
 Elaboration:
