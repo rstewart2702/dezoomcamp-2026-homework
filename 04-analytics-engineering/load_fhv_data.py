@@ -36,7 +36,7 @@ client = storage.Client(project='datatalks-dezoomcamp2026')
 
 
 # BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2019-"
-BASE_URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/fhv/fhv_tripdata"
+BASE_URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/fhv/fhv_tripdata"
 
 MONTHS = [(f"{yr:04d}", f"{i:02d}") for yr in range(2019,2020) for i in range(1, 13)]
 DOWNLOAD_DIR = "./homework-04-downloads"
