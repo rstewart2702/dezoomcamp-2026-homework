@@ -1,5 +1,310 @@
 # Repository for Data Engineering Zoomcamp
 
+## Homework 4
+
+### Question 1. dbt Lineage and Execution
+
+Given a dbt project with the following structure:
+
+```
+models/
+├── staging/
+│   ├── stg_green_tripdata.sql
+│   └── stg_yellow_tripdata.sql
+└── intermediate/
+    └── int_trips_unioned.sql (depends on stg_green_tripdata & stg_yellow_tripdata)
+```
+
+if you run `dbt run --select int_trips_unioned`, what models will be built?
+
+* `stg_green_tripdata`, `stg_yellow_tripdata`, and `int_trips_unioned` (upstream dependencies)
+* Any model with upstream and downstream dependencies to `int_trips_unioned`
+* `int_trips_unioned` only
+* `int_trips_unioned`, `int_trips`, `fct_trips` (downstream dependencies)
+
+ANSWER:
+* `int_trips_unioned` only
+
+Elaboration:
+
+There are other notations that can be used with the `dbt run --select`:
+
+There are lots of variations and "graph operators" which allow one to
+ask `dbt` to build all of the "downstream descendants," for example.
+
+In order to ask for the construction/derivation of `int_trips_unioned` and its
+upstream dependencies, `stg_green_tripdata` and `stg_yellow_tripdata`, one would use the command:
+
+```
+dbt run --select +int_trips_unioned
+```
+
+Also, the `dbt ls --select +int_trips_unioned` would show you what would be "run" without
+running it; `dbt ls` lets you see what the "graph selection syntax" allows you to
+specify.
+
+References:
+https://docs.getdbt.com/reference/node-selection/syntax
+https://docs.getdbt.com/reference/commands/run
+https://docs.getdbt.com/reference/commands/list
+
+
+=============================================================
+
+### Question 2. dbt Tests
+
+You've configured a generic test like this in your `schema.yml` :
+
+```
+columns:
+  - name: payment_type
+    data_tests:
+      - accepted_values:
+          arguments:
+            values: [1, 2, 3, 4, 5]
+            quote: false
+```
+
+Your model `fct_trips` has been running successfully for months.  A new value `6` now appears in the source data.
+
+What happens when you run `dbt --test --select fct_trips`?
+
+
+* dbt will skip the test because the model didn't change
+* dbt will fail the test, returning a non-zero exit code
+* dbt will pass the test with a warning about the new value
+* dbt will update the configuration to include the new value
+
+ANSWER;
+* dbt will fail the test, returning a non-zero exit code
+
+Elaboration:
+
+I tried to explore this behavior by tweaking the `taxi_rides-ny/models/marts/schema.yml`
+by adding `data_tests` to the column definition for `payment_type` and adding
+the `accepted_values` tests in the manner described above:
+
+```
+      - name: payment_type
+        description: Payment method code
+        data_type: integer
+        data_tests:
+        - accepted_values:
+            arguments:
+              values: [1, 2, 3, 4]
+              quote: false
+```
+
+and then ran a `dbt build --select fct_trips --full-refresh` to get `dbt` to
+show me what an error condition and test failure looks like when it finds
+values of 5 in column `payment_type`.
+
+
+=============================================================
+
+### Question 3. Counting Records in `fct_monthly_zone_revenue`
+
+After running your dbt project, query the `fct_monthly_zone_revenue` model.
+
+What is the count of records in the `fct_monthly_zone_revenue` model?
+
+```
+    12,998
+    14,120
+    12,184
+    15,421
+```
+
+ANSWER:
+
+```
+    12,184
+```
+
+Elaboration:
+
+```
+select count(*) row_tally from `dbt_rstewart.fct_monthly_zone_revenue`;
+```
+
+yielded the correct result, *after* executing `dbt build --target -prod --full-refresh`
+to derived correct population of data, after I discovered that I had typos in the
+uri's used to query the "data lake csv.gz files" that had been loaded into cloud
+storage!
+
+=============================================================
+
+### Question 4. Best Performing Zone for Green Taxis (2020)
+
+Using the `fct_monthly_zone_revenue` table, find the pickup zone with the highest total revenue (`revenue_monthly_total_amount`) for *Green* taxi trips in 2020.
+
+Which zone had the highest revenue?
+
+    * East Harlem North
+    * Morningside Heights
+    * East Harlem South
+    * Washington Heights South
+
+ANSWER:
+    * East Harlem North
+
+
+Elaboration:
+
+The following query yielded the answer:
+
+```
+select t.pickup_zone, sum(t.revenue_monthly_total_amount) tot_revenue, t.service_type  
+from `dbt_rstewart.fct_monthly_zone_revenue` t 
+where 
+    t.service_type = 'Green' 
+and 
+    '2020-01-01' <= t.revenue_month and t.revenue_month <= '2020-12-01'
+group by t.pickup_zone, t.service_type
+order by sum(t.revenue_monthly_total_amount) desc;
+```
+
+=============================================================
+
+### Question 5. Green Taxi Trip Counts (October 2019)
+
+Using the fct_monthly_zone_revenue table, what is the total number of trips (total_monthly_trips) for Green taxis in October 2019?
+
+```
+    500,234
+    350,891
+    384,624
+    421,509
+```
+
+ANSWER:
+
+```
+    384,624
+```
+
+Elaboration:
+
+```
+select sum(t.total_monthly_trips) sum_tot_monthly_trips
+from `dbt_rstewart.fct_monthly_zone_revenue` t where t.service_type='Green' and t.revenue_month = '2019-10-01';
+```
+
+=============================================================
+
+### Question 6. Build a Staging Model for FHV Data
+
+Create a staging model for the *For-Hire Vehicle (FHV)* trip data for 2019.
+
+  1.  Load the [FHV trip data](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/fhv) for 2019 into your data warehouse
+  2.  Create a staging model `stg_fhv_tripdata` with these requirements:
+      * Filter out records where `dispatching_base_num` IS NULL
+      * Rename fields to match your project's naming conventions (e.g., `PUlocationID` → `pickup_location_id`)
+
+What is the count of records in stg_fhv_tripdata?
+
+  * 42,084,899
+  * 43,244,693
+  * 22,998,722
+  * 44,112,187
+
+ANSWER:
+  * 43,244,693
+
+
+
+Elaboration:
+I shall have to gin up a python loading program just to set up the GCP
+data for that "fhv" stuff; DONE 2026-02-16 Mon 10:27
+
+I will need to define an "external table" for the fhv data; DONE 2026-02-16 Mon 10:29
+
+What actually worked out:
+(after asking Gemini for a little help!)
+The SQL comes first, then the yml files which document/elucidate the "schema" and
+"sources" can be automatically generated, given the right "dbt plugin," and
+It looks like those are automatically added when using dbt cloud, it seems.
+
+And:  it seems to be more complicated than that, for dbt stopped to complain
+with:
+
+```
+Compilation Error
+  Model 'model.taxi_rides_ny.stg_fhv_tripdata' (models/staging/stg_fhv_tripdata.sql) depends on a source named 'raw.fhv_tripdata' which was not found
+```
+
+So, I had to add some text to the `taxi_rides_ny/models/staging/sources.yml` file.
+That seems to be required, at least in the case of this project's definition.
+
+So, I created a taxi_rides_ny/models/staging/stg_fhv_tripdata.sql file
+and ran
+
+```
+dbt run --select stg_fhv_tripdata
+```
+
+And after correcting a typo in my SQL, the command above created a
+view which queries the "data lake o'csv files" which are reached
+via the name `dbt_rstewart.fhv_tripdata`.
+
+#### Further Notes
+
+It turns out that some parts can be generated automatically, with commands
+like the following?
+
+```
+dbt run-operation generate_model_yaml --args '{ "model_names":  ["stg_fhv_tripdata"] }'
+```
+
+So I tried it, and it spat out the following to the logged output in the `dbt platform`:
+
+```
+models:
+  - name: stg_fhv_tripdata
+    description: ""
+    columns:
+      - name: dispatching_base_num
+        data_type: string
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+
+      - name: sr_flag
+        data_type: int64
+        description: ""
+
+      - name: affiliated_base_number
+        data_type: string
+        description: ""
+```
+
+So, this is a start on what could be pasted into the `taxi_rides_ny/models/staging/schema.yml`.
+
+And, the "studio" in `dbt cloud` or `dbt platform` leaves a lot to be desired as far as
+interactions with Git are concerned:  I guess you'd better "restart" studio after making
+changes to files in your project which have *not* been committed yet?  But it's really
+hard to tell, and I hope their documentation talks about it.  But they've clearly tried
+to emulate the VSCode experience, and this has caused me lots of confusion because
+it looked like I had lost work when I really had not, all because the editor in the "studio"
+got out of sync with the "git repository and local working-copy" reality.  This has not
+been a good developer experience.
+
+
+
 ## Homework 3
 ### Loading Data
 Python to load into my GCP Big Query tables is [here](03-data-warehouse/load_yellow_taxi_data.py).
