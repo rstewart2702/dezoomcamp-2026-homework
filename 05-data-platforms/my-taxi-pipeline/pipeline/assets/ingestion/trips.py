@@ -51,9 +51,41 @@ import os
 import json
 import pandas as pd
 
+def list_of_months(start_month, end_month):
+    '''
+    Uses "ordinary" while loop interation instead of range-objects.
+    Range objects could probably be used, but I struggled to come up
+    with an elegant, reasonable way to use them which was not more 
+    complicated than what I have done here.
+    '''
+    # We assume that the start_month, end_month have format "yyyy-mm".
+    initial_year = int(start_month[0:4])  # should be the "yyyy" part at the start of the string.
+    initial_month = int(start_month[5:7])  # should be the "mm" part at the end of the string.
+    # And then the same reasoning applies to the end_month:
+    end_year = int(end_month[0:4])
+    end_month = int(end_month[5:7])
+    #
+    yr = initial_year
+    mth = initial_month
+    while yr != end_year:
+        yield(yr,mth)
+        mth += 1
+        while mth != 13:
+            yield(yr,mth)
+            mth += 1
+        mth = 1
+        yr += 1
+    # and now we decide what to do because yr == end_year
+    while mth != end_month+1 :
+        yield (yr,mth)
+        mth += 1
+    #
+
+
 # TODO: Only implement `materialize()` if you are using Bruin Python materialization.
 # If you choose the manual-write approach (no `materialization:` block), remove this function and implement ingestion
 # as a standard Python script instead.
+# NOTE: This is intended to return a dataframe (pandas?) so I need to understand how to do that.
 def materialize():
     start_date = os.environ["BRUIN_START_DATE"]
     end_date = os.environ["BRUIN_END_DATE"]
@@ -62,5 +94,18 @@ def materialize():
     # Generate list of months between start and end dates
     # Fetch parquet files from:
     # https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet
+    # To make this as simple as possible, I shall simply assume that the starting and ending dates 
+    # are going to be in "yyyy-mm" format to make parsing-out of url parts as simpler.  Generalized
+    # date-string parsing will have to come later.
+    # Also, this attempts to read all of the yellow taxi data into gigantic
+    # data frame, which may become a problem, but I will try this dirt-simple 
+    # approach first.
+    dfs = []
+    big_df = None
+    taxi_type = 'yellow'
+    for (yr, month) in list_of_months(start_date, end_date):
+        df = pd.read_parquet(f'https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{yr}-{mth}.parquet')
+        dfs.append(df)
+    big_df = pd.concat(dfs, ignore_index=True)
 
-    return final_dataframe
+    return big_df
