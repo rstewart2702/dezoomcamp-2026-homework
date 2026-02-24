@@ -50,6 +50,7 @@ columns:
 import os
 import json
 import pandas as pd
+import pyarrow
 
 def list_of_months(start_month, end_month):
     '''
@@ -102,10 +103,14 @@ def materialize():
     # approach first.
     dfs = []
     big_df = None
-    taxi_type = 'yellow'
-    for (yr, month) in list_of_months(start_date, end_date):
-        df = pd.read_parquet(f'https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{yr}-{mth}.parquet')
-        dfs.append(df)
+    # taxi_type = 'yellow'
+    for taxi_type in taxi_types :
+        for (yr, mth) in list_of_months(start_date, end_date):
+            big_url = f'https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{yr}-{mth:02}.parquet'
+            print(f'Now trying:  {big_url}')
+            df = pd.read_parquet(big_url, engine='pyarrow') 
+                                 # https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet
+            dfs.append(df)
     big_df = pd.concat(dfs, ignore_index=True)
 
     return big_df
