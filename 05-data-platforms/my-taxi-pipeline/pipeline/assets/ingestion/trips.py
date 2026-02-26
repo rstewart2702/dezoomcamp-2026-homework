@@ -165,6 +165,7 @@ def materialize():
             # WE DO NOT, YET HAVE A MAPPING FOR COLUMN NAMED taxi_type!!!
             # I do not yet understand how to map columns which aren't 
             # present in the original DataFrame into the target table.
+            df.insert(0, 'taxi_type', taxi_type)
             dfs.append(df)
     big_df = pd.concat(dfs, ignore_index=True)
 
