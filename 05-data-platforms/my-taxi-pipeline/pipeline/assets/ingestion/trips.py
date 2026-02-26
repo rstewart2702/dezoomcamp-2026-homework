@@ -82,6 +82,52 @@ def list_of_months(start_month, end_month):
         mth += 1
     #
 
+column_mappings = {
+    'green' :  {
+      'VendorID': 'vendor_id',
+      'lpep_pickup_datetime': 'pickup_datetime',
+      'lpep_dropoff_datetime': 'dropoff_datetime',
+      'store_and_fwd_flag': '',
+      'RateCodeID': 'rate_code_id',
+      'PULocationID': 'pickup_location_id',
+      'DOLocationID': 'dropoff_location_id',
+      'passenger_count': 'passenger_count'
+      'trip_distance': 'trip_distance'
+      'fare_amount': 'fare_amount'
+      'extra': 'extra'
+      'mta_tax': 'mta_tax'
+      'tip_amount': 'tip_amount'
+      'tolls_amount': 'tolls_amount'
+      'ehail_fee': 'ehail_fee'
+      'improvement_surcharge': 'improvement_surcharge'
+      'total_amount': 'total_amount'
+      'payment_type': 'payment_type_name'
+      'trip_type': 'trip_type',
+      'congestion_surcharge': 'congestion_surcharge'
+    },
+    'yellow' : {
+      'VendorID': 'vendor_id',
+      'tpep_pickup_datetime': 'pickup_datetime',
+      'tpep_dropoff_datetime': 'dropoff_datetime',
+      'passenger_count': 'passenger_count',
+      'trip_distance': 'trip_distance',
+      'RatecodeID': 'ratecode_id',
+      'store_and_fwd_flag': 'store_and_fwd_flag',
+      'PULocationID': 'pickup_location_id',
+      'DOLocationID': 'dropoff_location_id',
+      'payment_type': 'payment_type_name',
+      'fare_amount': 'fare_amount',
+      'extra': 'extra',
+      'mta_tax': 'mta_tax',
+      'tip_amount': 'tip_amount',
+      'tolls_amount': 'tolls_amount',
+      'improvement_surcharge': 'improvement_surcharge',
+      'total_amount': 'total_amount',
+      'congestion_surcharge': 'congestion_surcharge',
+      'airport_fee': 'airport_fee'
+    }
+}
+
 
 # TODO: Only implement `materialize()` if you are using Bruin Python materialization.
 # If you choose the manual-write approach (no `materialization:` block), remove this function and implement ingestion
@@ -110,6 +156,11 @@ def materialize():
             print(f'Now trying:  {big_url}')
             df = pd.read_parquet(big_url, engine='pyarrow') 
                                  # https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet
+            # THIS IS PART OF THE MAPPING SOLUTION:
+            df.rename(columns = column_mappings[taxi_type], inplace=True)
+            # WE DO NOT, YET HAVE A MAPPING FOR COLUMN NAMED taxi_type!!!
+            # I do not yet understand how to map columns which aren't 
+            # present in the original DataFrame into the target table.
             dfs.append(df)
     big_df = pd.concat(dfs, ignore_index=True)
 
