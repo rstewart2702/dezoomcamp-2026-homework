@@ -6,7 +6,7 @@
 # - Quality checks: https://getbruin.com/docs/bruin/quality/available_checks
 
 # TODO: Set the asset name (recommended: reports.trips_report).
-name: Treports.trips_report
+name: reports.trips_report
 
 # TODO: Set platform type.
 # Docs: https://getbruin.com/docs/bruin/assets/sql
@@ -69,3 +69,4 @@ where
     pickup_datetime >= '{{ start_datetime }}'
 and pickup_datetime <  '{{ end_datetime }}'
 group by 1, 2, 3
+;
