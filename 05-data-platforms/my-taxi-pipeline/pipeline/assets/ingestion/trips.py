@@ -105,7 +105,7 @@ column_mappings = {
       'ehail_fee': 'ehail_fee',
       'improvement_surcharge': 'improvement_surcharge',
       'total_amount': 'total_amount',
-      'payment_type': 'payment_type_name',
+      'payment_type': 'payment_type',
       'trip_type': 'trip_type',
       'congestion_surcharge': 'congestion_surcharge'
     },
@@ -119,7 +119,7 @@ column_mappings = {
       'store_and_fwd_flag': 'store_and_fwd_flag',
       'PULocationID': 'pickup_location_id',
       'DOLocationID': 'dropoff_location_id',
-      'payment_type': 'payment_type_name',
+      'payment_type': 'payment_type',
       'fare_amount': 'fare_amount',
       'extra': 'extra',
       'mta_tax': 'mta_tax',
