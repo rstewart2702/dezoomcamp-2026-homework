@@ -96,6 +96,9 @@ custom_checks:
 -- Therefore, your query MUST filter to the same time window so only that subset is inserted.
 -- If you don't filter, you'll insert ALL data but only delete the window's data = duplicates.
 
+-- 2026-02-26 Thu 02:18
+-- What ain't exactly clear here:  which "variables" get promoted into
+-- here. I suspect the only ones are the "environment variables."
 select
   t.pickup_datetime
 , t.dropoff_datetime
@@ -117,6 +120,7 @@ qualify row_number() over (
                t.pickup_location_id, t.dropoff_location_id, t.fare_amount
   order by t.pickup_datetime
 ) = 1
+;
 
 -- the "qualify row_number() ... = 1" is intended to deduplicate using a composite key
 --   (and I have never seen this syntax before...)
