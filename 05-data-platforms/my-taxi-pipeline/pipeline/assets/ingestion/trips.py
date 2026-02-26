@@ -82,6 +82,10 @@ def list_of_months(start_month, end_month):
         mth += 1
     #
 
+# Column mapping dictionary for the different kinds of tables
+# we're ingesting.  There's a great deal done by the "ingestr" 
+# system's infrastructure which was not terribly explicit in the 
+# written tutorial material.
 column_mappings = {
     'green' :  {
       'VendorID': 'vendor_id',
@@ -91,17 +95,17 @@ column_mappings = {
       'RateCodeID': 'rate_code_id',
       'PULocationID': 'pickup_location_id',
       'DOLocationID': 'dropoff_location_id',
-      'passenger_count': 'passenger_count'
-      'trip_distance': 'trip_distance'
-      'fare_amount': 'fare_amount'
-      'extra': 'extra'
-      'mta_tax': 'mta_tax'
-      'tip_amount': 'tip_amount'
-      'tolls_amount': 'tolls_amount'
-      'ehail_fee': 'ehail_fee'
-      'improvement_surcharge': 'improvement_surcharge'
-      'total_amount': 'total_amount'
-      'payment_type': 'payment_type_name'
+      'passenger_count': 'passenger_count',
+      'trip_distance': 'trip_distance',
+      'fare_amount': 'fare_amount',
+      'extra': 'extra',
+      'mta_tax': 'mta_tax',
+      'tip_amount': 'tip_amount',
+      'tolls_amount': 'tolls_amount',
+      'ehail_fee': 'ehail_fee',
+      'improvement_surcharge': 'improvement_surcharge',
+      'total_amount': 'total_amount',
+      'payment_type': 'payment_type_name',
       'trip_type': 'trip_type',
       'congestion_surcharge': 'congestion_surcharge'
     },
