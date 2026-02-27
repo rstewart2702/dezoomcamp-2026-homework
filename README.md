@@ -122,7 +122,6 @@ ANSWER:
 NOTES:
 See https://getbruin.com/docs/bruin/quality/available_checks.html#not-null
 
-
 ---
 
 ### Question 6. Lineage and Dependencies
@@ -133,6 +132,22 @@ After building your pipeline, you want to visualize the dependency graph between
 - `bruin dependencies`
 - `bruin lineage`
 - `bruin show`
+
+ANSWER:
+
+- `bruin lineage`
+
+NOTES:
+For more details, try:
+
+```
+bruin lineage --full <PATH_TO_ASSET>
+```
+
+The VSCode extension is nice for this, but the extension does other
+things to your asset files that can be misleading and confusing!
+There is not a "graphical display" of this information from the
+command-line.
 
 ---
 
@@ -145,11 +160,20 @@ You're running a Bruin pipeline for the first time on a new DuckDB database. Wha
 - `--full-refresh`
 - `--truncate`
 
----
+ANSWER:
 
-## Submitting the solutions
+- `--full-refresh`
 
-- Form for submitting: <https://courses.datatalks.club/de-zoomcamp-2026/homework/hw5>
+NOTES:
+Whenever you need quick answer to such a question, the command-line
+argument `--help` is sometimes useful.  For example:
+
+```
+bruin run --help
+```
+
+gives some details on the meaning of the `--full-refresh` flag-argument.
+
 
 =======
 
