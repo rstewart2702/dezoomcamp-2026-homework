@@ -120,7 +120,7 @@ ANSWER:
 - `name: not_null`
 
 NOTES:
-See [](https://getbruin.com/docs/bruin/quality/available_checks.html#not-null)
+See (https://getbruin.com/docs/bruin/quality/available_checks.html#not-null)
 
 
 ---
