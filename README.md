@@ -38,6 +38,16 @@ You're building a pipeline that processes NYC taxi data organized by month based
 - `time_interval` - incremental based on a time column
 - `view` - create a virtual table only
 
+ANSWER:
+
+- `time_interval` - incremental based on a time column
+
+NOTES
+
+Based this upon reading through the Bruin documentation, for example, in:
+
+("Materialization Strategy")[https://getbruin.com/docs/bruin/assets/materialization.html#materialization-strategy]
+
 ---
 
 ### Question 3. Pipeline Variables
