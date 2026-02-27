@@ -45,7 +45,6 @@ ANSWER:
 NOTES
 
 Based this upon reading through the Bruin documentation, for example, in:
-
 ["Materialization Strategy"](https://getbruin.com/docs/bruin/assets/materialization.html#materialization-strategy)
 
 ---
@@ -70,6 +69,23 @@ How do you override this when running the pipeline to only process yellow taxis?
 - `bruin run --var 'taxi_types=["yellow"]'`
 - `bruin run --set taxi_types=["yellow"]`
 
+ANSWER:
+
+- `bruin run --var 'taxi_types=["yellow"]'`
+
+NOTES:
+Typically, one must quote such commmand-line arguments to prevent
+the command-shell from trying to "interpret" or otherwise change
+strings like:
+
+```
+taxi_types=["yellow"]
+```
+
+and that command-line argument is enclosed in "single quote marks,"
+i.e., the `'` character.  So, we go from `taxi_types = ["yellow", "green"]` to
+`taxi_types = ["yellow"]`.
+
 ---
 
 ### Question 4. Running with Dependencies
@@ -81,6 +97,13 @@ You've modified the `ingestion/trips.py` asset and want to run it plus all downs
 - `bruin run pipeline/trips.py --recursive`
 - `bruin run --select ingestion.trips+`
 
+ANSWER:
+
+- `bruin run ingestion/trips.py --downstream`
+
+NOTES:
+One way to see this is simply to run it...
+
 ---
 
 ### Question 5. Quality Checks
@@ -91,6 +114,14 @@ You want to ensure the `pickup_datetime` column in your trips table never has NU
 - `name: not_null`
 - `name: positive`
 - `name: accepted_values, value: [not_null]`
+
+ANSWER:
+
+- `name: not_null`
+
+NOTES:
+See [](https://getbruin.com/docs/bruin/quality/available_checks.html#not-null)
+
 
 ---
 
