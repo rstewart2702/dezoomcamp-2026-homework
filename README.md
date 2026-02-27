@@ -46,7 +46,7 @@ NOTES
 
 Based this upon reading through the Bruin documentation, for example, in:
 
-("Materialization Strategy")[https://getbruin.com/docs/bruin/assets/materialization.html#materialization-strategy]
+["Materialization Strategy"](https://getbruin.com/docs/bruin/assets/materialization.html#materialization-strategy)
 
 ---
 
