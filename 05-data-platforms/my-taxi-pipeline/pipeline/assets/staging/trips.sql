@@ -77,7 +77,7 @@ custom_checks:
       -- TODO: return a single scalar (COUNT(*), etc.) that should match `value`
       SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
       FROM staging.trips
-    value: 0
+    value: 1
 
 @bruin */
 
