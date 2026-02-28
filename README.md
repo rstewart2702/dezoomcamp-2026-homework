@@ -27,6 +27,12 @@ where the command was run.  Also, the `.bruin.yml` in the root
 folder/directory of the git repository was touched.  This file
 was first created by work done earlier with other bruin exercises.
 
+In https://getbruin.com/docs/bruin/pipelines/definition.html, the
+documentation says that assets need to be in a folder named `assets`
+adjacent to the `pipeline.yml` file.  I took this to mean that
+you need to have pipeline definitions alongside the corresponding
+asset definitions.
+
 ---
 
 ### Question 2. Materialization Strategies
